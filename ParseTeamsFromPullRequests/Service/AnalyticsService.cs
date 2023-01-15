@@ -107,7 +107,7 @@ namespace ParseTeamsFromPullRequests.Service
             if (string.IsNullOrWhiteSpace(member))
                 throw new ArgumentNullException(nameof(member));
 
-			var team = "unknown";
+			var team = member;
 			if (memberByTeam.ContainsKey(member))
 				team = memberByTeam[member];
 			return team;
