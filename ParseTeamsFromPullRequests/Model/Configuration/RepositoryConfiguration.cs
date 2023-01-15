@@ -6,7 +6,7 @@
         public string Organization { get; set; }
         public string Project { get; set; }
         public string RepositoryId { get; set; }
-        
+        public string PersonalAccessTokens { get; set; }
     }
 }
 

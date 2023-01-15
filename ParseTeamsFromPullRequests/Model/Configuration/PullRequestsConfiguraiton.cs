@@ -3,7 +3,9 @@
 	public class PullRequestsConfiguraiton 
     {
 		public static string Name => "PullRequestsConfiguraiton";
-        public HashSet<string> StopWords { get; set; }
-	}
+		public int SearchDepthDays { get; set; }
+        public HashSet<string> IgnoreInDescription { get; set; }
+        public HashSet<string> IgnoredServiceName { get; set; }
+    }
 }
 

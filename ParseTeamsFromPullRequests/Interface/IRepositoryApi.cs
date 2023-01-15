@@ -1,13 +1,10 @@
-﻿using System;
-using ParseTeamsFromPullRequests.Model;
-
-namespace ParseTeamsFromPullRequests.Interfaces
+﻿namespace ParseTeamsFromPullRequests.Interfaces
 {
 	public interface IRepositoryApi
 	{
-		public Task<(bool isError, string errorDescription, List<PullRequest> pullRequests)> GetPullRequestsAsync();
-		public string GetCommits(ulong pullRequestId);
-		public string GetChanges(ulong commitId);
+		public Task<(bool isError, string errorDesc, List<Model.PullRequest.Value> pullRequests)> GetPullRequestsCompletedAsync();
+		public Task<(bool isError, string errorDesc, List<Model.Commit.Value> commits)> GetCommits(int pullRequestId);
+		public Task<(bool isError, string errorDesc, List<Model.CommitChanges.Change> commitChanges)> GetCommitChanges(string commitId);
 	}
 }
 
