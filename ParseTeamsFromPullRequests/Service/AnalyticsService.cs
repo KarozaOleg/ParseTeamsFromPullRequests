@@ -7,7 +7,7 @@ namespace ParseTeamsFromPullRequests.Service
 {
 	public class AnalyticsService
 	{
-        public (bool isError, string errorDesc, Dictionary<string, Dictionary<string, int>> value) GetServiceWithAmountByTeam(List<PullRequestInfo> pullRequestsInfo, Dictionary<string, string> memberByTeam, HashSet<string> ignoredServiceNames)
+        public (bool isError, string errorDesc, SortedDictionary<string, SortedDictionary<string, int>> value) GetServiceWithAmountByTeam(List<PullRequestInfo> pullRequestsInfo, Dictionary<string, string> memberByTeam, HashSet<string> ignoredServiceNames)
         {
             if (ignoredServiceNames == null)
                 throw new ArgumentNullException(nameof(ignoredServiceNames));
@@ -22,7 +22,7 @@ namespace ParseTeamsFromPullRequests.Service
                     if (splittedPath.Length > 2)
                     {
                         if (ignoredServiceNames.Any(splittedPath[2].Contains) == false)
-                            service = splittedPath[2];
+                            service = $"{splittedPath[1]}/{splittedPath[2]}";
                     }
 
                     return service;
@@ -38,7 +38,7 @@ namespace ParseTeamsFromPullRequests.Service
             }
         }
 
-        public (bool isError, string errorDesc, Dictionary<string, Dictionary<string, int>> value) GetRootWithAmountByTeam(List<PullRequestInfo> pullRequestsInfo, Dictionary<string, string> memberByTeam)
+        public (bool isError, string errorDesc, SortedDictionary<string, SortedDictionary<string, int>> value) GetRootWithAmountByTeam(List<PullRequestInfo> pullRequestsInfo, Dictionary<string, string> memberByTeam)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace ParseTeamsFromPullRequests.Service
             }
         }
 
-        private Dictionary<string, Dictionary<string, int>> ReturnTeamWithAmountByPath(List<PullRequestInfo> pullRequestsInfo, Dictionary<string, string> memberByTeam, Func<string, string> pathHandler)
+        private SortedDictionary<string, SortedDictionary<string, int>> ReturnTeamWithAmountByPath(List<PullRequestInfo> pullRequestsInfo, Dictionary<string, string> memberByTeam, Func<string, string> pathHandler)
         {
             if (pullRequestsInfo == null)
                 throw new ArgumentNullException(nameof(pullRequestsInfo));
@@ -72,7 +72,7 @@ namespace ParseTeamsFromPullRequests.Service
             if (pathHandler == null)
                 throw new ArgumentNullException(nameof(pathHandler));
 
-            var teamWithAmountByPath = new Dictionary<string, Dictionary<string, int>>();
+            var teamWithAmountByPath = new SortedDictionary<string, SortedDictionary<string, int>>();
             foreach (var pullRequestInfo in pullRequestsInfo)
             {
                 var team = ReturnTeamByMember(pullRequestInfo.Owner, memberByTeam);
@@ -91,7 +91,7 @@ namespace ParseTeamsFromPullRequests.Service
                     usedPaths.Add(pathHandled);
 
                     if (teamWithAmountByPath.ContainsKey(pathHandled) == false)
-                        teamWithAmountByPath.Add(pathHandled, new Dictionary<string, int>());
+                        teamWithAmountByPath.Add(pathHandled, new SortedDictionary<string, int>());
 
                     if (teamWithAmountByPath[pathHandled].ContainsKey(team) == false)
                         teamWithAmountByPath[pathHandled].Add(team, 0);

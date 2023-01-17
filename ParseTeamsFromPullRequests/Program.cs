@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using NLog;
 using ParseTeamsFromPullRequests.Extensions;
 using ParseTeamsFromPullRequests.Model;
@@ -57,8 +58,8 @@ static class Program
             if (serviceByTeam.isError)
                 throw new Exception($"serviceByTeam analytics failed, details:{serviceByTeam.errorDesc}");
 
-            PrintAnalytics(nameof(rootByTeam), rootByTeam.value);
-            PrintAnalytics(nameof(serviceByTeam), serviceByTeam.value);
+            WriteToFileAnalytics(nameof(rootByTeam), TeamsConfiguration.Teams, rootByTeam.value);
+            WriteToFileAnalytics(nameof(serviceByTeam), TeamsConfiguration.Teams, serviceByTeam.value);
 
             Console.ReadKey();
         }
@@ -69,16 +70,29 @@ static class Program
         }
     }
 
-    static void PrintAnalytics(string name, Dictionary<string, Dictionary<string, int>> analytics)
+    static void WriteToFileAnalytics(string name, List<Team> teams, SortedDictionary<string, SortedDictionary<string, int>> analytics)
     {
-        Console.WriteLine($"Going to print analytic for {name}");
-        foreach (var item in analytics)
+        var path = Path.Combine(Environment.CurrentDirectory, name);
+        using (var sw = new StreamWriter(path, false))
         {
-            var teamsWithAmount = new StringBuilder(1000);
-            foreach (var itemFromArray in item.Value)
-                teamsWithAmount.Append($"{itemFromArray.Key}[{itemFromArray.Value}]");
-            Console.WriteLine($"{item.Key} - {teamsWithAmount.ToString()}");
+            foreach (var item in analytics)
+            {
+                foreach (var team in teams)
+                    if (item.Value.ContainsKey(team.Name) == false)
+                        item.Value.Add(team.Name, 0);
+
+                var teamsWithAmount = new StringBuilder(1000);
+                var i = 0;
+                foreach (var itemFromArray in item.Value)
+                {
+                    teamsWithAmount.Append($"{itemFromArray.Key};{itemFromArray.Value}");
+                    if (++i < item.Value.Count)
+                        teamsWithAmount.Append(";");
+                }
+                sw.WriteLine($"{item.Key};{teamsWithAmount}");
+            }
         }
+        Console.WriteLine($"{name} written to the file succesfully");
     }
 }
 
